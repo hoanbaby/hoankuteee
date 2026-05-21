@@ -11,6 +11,14 @@ body {
   padding: 0 16px;
 }
 header h1 { margin-bottom: 8px; }
+.back-home {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-home:hover { text-decoration: underline; }
 .card {
   background: #fff;
   border-radius: 12px;

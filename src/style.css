@@ -1,0 +1,14 @@
+:root{--bg:#f4f4f4;--card:#fff;--text:#1a1a1a;--accent:#d3a86d}
+*{box-sizing:border-box}body{margin:0;font-family:Montserrat,sans-serif;background:linear-gradient(#efefef,#f9f9f9);color:var(--text)}
+.page{max-width:1300px;margin:18px auto;padding:24px;border-radius:24px;background:#f8f8f8;border:1px solid #e6e6e6}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.logo{font-weight:800;letter-spacing:2px}.logo span{color:var(--accent)}
+nav{display:flex;gap:30px;font-size:14px}nav a{color:#434343}nav .active{border-bottom:2px solid var(--accent);padding-bottom:8px}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:30px;align-items:center}.eyebrow{color:#9f86cf;letter-spacing:3px;font-size:14px}
+h1{font-size:74px;line-height:.95;margin:10px 0 12px}h1 span{font-family:'Playfair Display',serif;color:var(--accent);font-style:italic;font-weight:400}
+.desc{font-weight:600}.sub{color:#555;max-width:680px}.actions{display:flex;gap:14px;margin-top:20px}button{padding:12px 24px;border-radius:10px;border:1px solid #d8c5a7;background:#fff;font-weight:600}.primary{background:#caa06a;color:#fff;border:none}
+.card{background:var(--card);border:1px solid #ececec;border-radius:18px;padding:16px}.right img{width:100%;height:420px;object-fit:cover;border-radius:16px}
+.grid3{margin-top:22px;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}.media .thumb{height:240px;border-radius:14px;background:linear-gradient(135deg,#8d96aa,#dfd4c2)}
+h3{margin:0 0 12px;font-size:18px;letter-spacing:2px}.stats{display:flex;gap:16px;margin-top:20px;color:#555}.stats b{display:block;color:var(--accent);font-size:28px}
+.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.skills span{border:1px solid #eee;padding:10px;border-radius:10px;text-align:center}
+.portfolio{margin-top:14px}.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.strip div{background:linear-gradient(120deg,#1f1f1f,#606f8a);color:#fff;padding:22px 12px;border-radius:12px;font-weight:700;text-align:center}
+@media (max-width:1024px){.hero,.grid3{grid-template-columns:1fr}h1{font-size:54px}.right img{height:320px}.strip{grid-template-columns:repeat(3,1fr)}}

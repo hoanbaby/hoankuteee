@@ -1,82 +1,108 @@
 import './style.css';
 
+const STORAGE_KEY = 'booking-web-app';
+
+const services = [
+  { id: 1, name: 'Khám tổng quát', duration: 30 },
+  { id: 2, name: 'Nha khoa', duration: 45 },
+  { id: 3, name: 'Tư vấn dinh dưỡng', duration: 60 }
+];
+
 document.querySelector('#app').innerHTML = `
-  <main class="page-shell">
-    <div class="page">
-      <header class="topbar">
-        <div class="logo">HOAN <span>ART</span></div>
-        <nav class="menu" aria-label="Main navigation">
-          <a class="active" href="#">Home</a>
-          <a href="#">About</a>
-          <a href="#">Showreel</a>
-          <a href="#">Portfolio</a>
-          <a href="#">Contact</a>
-        </nav>
-      </header>
+  <main class="container">
+    <header>
+      <h1>Booking Web (Full-stack Demo)</h1>
+      <p>Frontend Vite + backend mô phỏng bằng localStorage API.</p>
+    </header>
 
-      <section class="hero">
-        <div class="left">
-          <p class="eyebrow">MEDIA EDITOR & MOTION DESIGNER</p>
-          <h1>Bringing Vision to <span>Life</span></h1>
-          <p class="desc">Nguyễn Văn Hoan | Professional Media Editor & Motion Designer</p>
-          <p class="sub">I transform ideas into compelling visual stories. From cinematic edits to sleek motion graphics.</p>
-          <div class="actions">
-            <button class="primary">View Showreel</button>
-            <button>Contact Me</button>
-          </div>
-        </div>
+    <section class="card">
+      <h2>Tạo lịch hẹn</h2>
+      <form id="bookingForm" class="form-grid">
+        <label>Họ tên<input name="customerName" required placeholder="Nguyễn Văn A" /></label>
+        <label>Số điện thoại<input name="phone" required placeholder="0901234567" /></label>
+        <label>Dịch vụ<select name="serviceId" id="serviceSelect" required></select></label>
+        <label>Thời gian hẹn<input type="datetime-local" name="appointmentTime" required /></label>
+        <button type="submit">Đặt lịch</button>
+      </form>
+      <p id="status" class="status"></p>
+    </section>
 
-        <div class="right card hero-image-wrap">
-          <img
-            src="https://images.unsplash.com/photo-1624561172888-ac93c696e10c?q=80&w=1400&auto=format&fit=crop"
-            alt="Portrait of media editor"
-          />
-        </div>
-      </section>
-
-      <section class="grid3">
-        <article class="card media">
-          <h3>SHOWREEL</h3>
-          <div class="thumb"></div>
-        </article>
-
-        <article class="card about">
-          <h3>ABOUT ME</h3>
-          <p>
-            I'm Nguyễn Văn Hoan, a Media Editor & Motion Designer with passion for visual
-            storytelling and brand content.
-          </p>
-          <div class="stats">
-            <span><b>5+</b>Years</span>
-            <span><b>200+</b>Projects</span>
-            <span><b>100+</b>Clients</span>
-          </div>
-        </article>
-
-        <article class="card services">
-          <h3>SKILLS & SERVICES</h3>
-          <div class="skills">
-            <span>Video Editing</span>
-            <span>Motion Graphics</span>
-            <span>Color Grading</span>
-            <span>Branding</span>
-            <span>Social Content</span>
-            <span>Content Strategy</span>
-          </div>
-        </article>
-      </section>
-
-      <section class="portfolio card">
-        <h3>PORTFOLIO PREVIEW</h3>
-        <div class="strip">
-          <div>CINEMATIC</div>
-          <div>PRODUCT</div>
-          <div>MOTION</div>
-          <div>BRAND</div>
-          <div>MUSIC</div>
-          <div>SOCIAL</div>
-        </div>
-      </section>
-    </div>
+    <section class="card">
+      <h2>Danh sách lịch hẹn</h2>
+      <ul id="bookingList" class="booking-list"></ul>
+    </section>
   </main>
 `;
+
+const bookingForm = document.getElementById('bookingForm');
+const serviceSelect = document.getElementById('serviceSelect');
+const bookingList = document.getElementById('bookingList');
+const statusEl = document.getElementById('status');
+
+const db = {
+  getBookings() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  },
+  saveBookings(bookings) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+  },
+  createBooking(payload) {
+    const bookings = this.getBookings();
+    const service = services.find((item) => item.id === Number(payload.serviceId));
+    const booking = {
+      id: Date.now(),
+      customerName: payload.customerName,
+      phone: payload.phone,
+      appointmentTime: payload.appointmentTime,
+      serviceName: service?.name || 'Khác'
+    };
+    bookings.push(booking);
+    this.saveBookings(bookings);
+  },
+  deleteBooking(id) {
+    const bookings = this.getBookings().filter((item) => item.id !== id);
+    this.saveBookings(bookings);
+  }
+};
+
+function loadServices() {
+  serviceSelect.innerHTML = services
+    .map((service) => `<option value="${service.id}">${service.name} (${service.duration} phút)</option>`)
+    .join('');
+}
+
+function renderBookings() {
+  const bookings = db.getBookings();
+  bookingList.innerHTML = bookings.length
+    ? bookings
+        .map(
+          (booking) => `<li>
+              <div>
+                <strong>${booking.customerName}</strong> - ${booking.serviceName}<br />
+                <small>${booking.phone} • ${new Date(booking.appointmentTime).toLocaleString('vi-VN')}</small>
+              </div>
+              <button data-id="${booking.id}" class="delete-btn">Hủy</button>
+            </li>`
+        )
+        .join('')
+    : '<li>Chưa có lịch hẹn nào.</li>';
+}
+
+bookingForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const formData = new FormData(bookingForm);
+  db.createBooking(Object.fromEntries(formData.entries()));
+  bookingForm.reset();
+  statusEl.textContent = 'Đặt lịch thành công!';
+  renderBookings();
+});
+
+bookingList.addEventListener('click', (event) => {
+  const button = event.target.closest('.delete-btn');
+  if (!button) return;
+  db.deleteBooking(Number(button.dataset.id));
+  renderBookings();
+});
+
+loadServices();
+renderBookings();

@@ -11,6 +11,7 @@ const services = [
 document.querySelector('#app').innerHTML = `
   <main class="container">
     <header>
+      <a class="back-home" href="/">← Quay lại trang chủ</a>
       <h1>Booking Web (Full-stack Demo)</h1>
       <p>Frontend Vite + backend mô phỏng bằng localStorage API.</p>
     </header>

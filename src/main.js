@@ -80,7 +80,7 @@ document.querySelector('#app').innerHTML = `
         <div>
           <p class="badge">Music tab</p>
           <h2>Chill một chút</h2>
-          <p class="chill-sub">Không gian nghe nhạc riêng, hiện đại, không ảnh hưởng giao diện trang chủ.</p>
+          <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
         </div>
         <button id="closeChillBtn" type="button" aria-label="Đóng tab chill">×</button>
       </div>

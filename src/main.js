@@ -1,35 +1,18 @@
 import './style.css';
 
 const chillTracks = [
-  {
-    title: 'Midnight Breeze',
-    artist: 'Lofi Harbor',
-    mood: 'Focus · Calm',
-    length: '03:42'
-  },
-  {
-    title: 'Rain on Glass',
-    artist: 'Slow Neon',
-    mood: 'Rainy · Relax',
-    length: '04:18'
-  },
-  {
-    title: 'Sunset Echo',
-    artist: 'Cozy Tapes',
-    mood: 'Warm · Acoustic',
-    length: '02:56'
-  },
-  {
-    title: 'Night Ride',
-    artist: 'City Pulse',
-    mood: 'Urban · Dreamy',
-    length: '03:25'
-  }
+  { title: 'Midnight Breeze', artist: 'Lofi Harbor', mood: 'Focus · Calm', length: '03:42' },
+  { title: 'Rain on Glass', artist: 'Slow Neon', mood: 'Rainy · Relax', length: '04:18' },
+  { title: 'Sunset Echo', artist: 'Cozy Tapes', mood: 'Warm · Acoustic', length: '02:56' },
+  { title: 'Night Ride', artist: 'City Pulse', mood: 'Urban · Dreamy', length: '03:25' }
 ];
 
 document.querySelector('#app').innerHTML = `
   <div id="pageShell" class="page-shell">
-    <header class="topbar">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <header class="topbar glass">
       <div class="brand">HOAN <span>ART</span></div>
       <nav class="menu" aria-label="Top menu">
         <a href="#" class="active">Home</a>
@@ -42,29 +25,34 @@ document.querySelector('#app').innerHTML = `
     </header>
 
     <main class="content-grid">
-      <section class="hero">
+      <section class="hero glass">
         <p class="eyebrow">MEDIA EDITOR & MOTION DESIGNER</p>
         <h1>Bringing Vision to <em>Life</em></h1>
         <p class="lead">Nguyễn Văn Hoan · Professional Media Editor & Motion Designer</p>
-        <p class="sub">Từ cinematic edits đến motion graphics, mình kể câu chuyện bằng hình ảnh rõ ràng và cảm xúc.</p>
+        <p class="sub">Từ cinematic edits đến motion graphics, mình kể câu chuyện bằng hình ảnh rõ ràng, nghệ thuật và giàu cảm xúc.</p>
+        <div class="hero-tags">
+          <span>Visual Storytelling</span>
+          <span>Art Direction</span>
+          <span>Motion & Edit</span>
+        </div>
       </section>
 
-      <aside class="profile-card">
+      <aside class="profile-card glass">
         <div class="avatar"></div>
         <p>Hoan Art</p>
       </aside>
 
-      <section class="panel showreel">
+      <section class="panel showreel glass">
         <h3>Showreel</h3>
         <div class="video-placeholder">BRINGING VISION TO LIFE</div>
       </section>
 
-      <section class="panel about">
+      <section class="panel about glass">
         <h3>About me</h3>
-        <p>Mình giúp brand và creators tạo video đẹp, đúng mood, đúng mục tiêu.</p>
+        <p>Mình giúp brands và creators xây dựng nội dung video có chiều sâu thẩm mỹ, đúng insight khán giả và tối ưu hiệu quả truyền thông.</p>
       </section>
 
-      <section class="panel skills">
+      <section class="panel skills glass">
         <h3>Skills & services</h3>
         <ul>
           <li>Video Editing</li>
@@ -90,9 +78,7 @@ document.querySelector('#app').innerHTML = `
         <div class="track-meta">
           <strong>Midnight Breeze</strong>
           <span>Lofi Harbor</span>
-          <div class="progress">
-            <i></i>
-          </div>
+          <div class="progress"><i></i></div>
           <div class="time-row"><small>1:14</small><small>3:42</small></div>
         </div>
       </div>

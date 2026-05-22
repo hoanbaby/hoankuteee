@@ -8,145 +8,194 @@ const chillTracks = [
   { title: 'Cloud Notes', artist: 'Amber Keys', mood: 'Sleep · Soft', length: '05:01' }
 ];
 
-document.querySelector('#app').innerHTML = `
-  <div id="pageShell" class="page-shell">
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
+const routes = [
+  { key: 'home', label: 'Home', hash: '#/' },
+  { key: 'about', label: 'About', hash: '#/about' },
+  { key: 'showreel', label: 'Showreel', hash: '#/showreel' },
+  { key: 'portfolio', label: 'Portfolio', hash: '#/portfolio' },
+  { key: 'contact', label: 'Contact', hash: '#/contact' },
+  { key: 'chill', label: 'Chill một chút', hash: '#/chill', className: 'menu-chill' }
+];
 
-    <header class="topbar glass">
-      <div class="brand">HOAN <span>ART</span></div>
-      <nav class="menu" aria-label="Top menu">
-        <a id="homeLink" href="#/" class="active">Home</a>
-        <a href="#">About</a>
-        <a href="#">Showreel</a>
-        <a href="#">Portfolio</a>
-        <a href="#">Contact</a>
-        <a id="chillTabBtn" class="menu-chill" href="#/chill">Chill một chút</a>
-      </nav>
-    </header>
-
-    <main class="content-grid">
-      <section class="hero glass">
-        <p class="eyebrow">MEDIA EDITOR & MOTION DESIGNER</p>
-        <h1>Bringing Vision to <em>Life</em></h1>
-        <p class="lead">Nguyễn Văn Hoan · Professional Media Editor & Motion Designer</p>
-        <p class="sub">Từ cinematic edits đến motion graphics, mình kể câu chuyện bằng hình ảnh rõ ràng, nghệ thuật và giàu cảm xúc.</p>
-        <div class="hero-tags">
-          <span>Visual Storytelling</span>
-          <span>Art Direction</span>
-          <span>Motion & Edit</span>
-        </div>
-      </section>
-
-      <aside class="profile-card glass">
-        <div class="avatar"></div>
-        <p>Hoan Art</p>
-      </aside>
-
-      <section class="panel showreel glass">
-        <h3>Showreel</h3>
-        <div class="video-placeholder">BRINGING VISION TO LIFE</div>
-      </section>
-
-      <section class="panel about glass">
-        <h3>About me</h3>
-        <p>Mình giúp brands và creators xây dựng nội dung video có chiều sâu thẩm mỹ, đúng insight khán giả và tối ưu hiệu quả truyền thông.</p>
-      </section>
-
-      <section class="panel skills glass">
-        <h3>Skills & services</h3>
-        <ul>
-          <li>Video Editing</li>
-          <li>Motion Graphics</li>
-          <li>Color Grading</li>
-          <li>Branding</li>
-        </ul>
-      </section>
-    </main>
-
-    <section id="chillPanel" class="chill-panel" aria-hidden="true">
-      <div class="chill-layout">
-        <div>
-          <div class="chill-head">
-            <div>
-              <p class="badge">Music page</p>
-              <h2>Chill một chút</h2>
-              <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
-            </div>
-            <a id="closeChillBtn" class="close-chill-link" href="#/" aria-label="Về trang chủ">×</a>
-          </div>
-
-          <div class="now-playing">
-            <div class="cover-art"></div>
-            <div class="track-meta">
-              <strong>Midnight Breeze</strong>
-              <span>Lofi Harbor · Focus · Calm</span>
-              <div class="progress" aria-label="Playback progress"><i></i></div>
-              <div class="time-row"><small>1:14</small><small>3:42</small></div>
-            </div>
-          </div>
-
-          <div class="player-actions" aria-label="Player controls">
-            <button type="button" aria-label="Previous">⏮</button>
-            <button type="button" class="play" aria-label="Play">▶</button>
-            <button type="button" aria-label="Next">⏭</button>
-          </div>
-
-          <div class="chill-stats">
-            <article>
-              <strong>24</strong>
-              <span>Tracks curated</span>
-            </article>
-            <article>
-              <strong>02h 11m</strong>
-              <span>Total runtime</span>
-            </article>
-            <article>
-              <strong>Lo-fi / Ambient</strong>
-              <span>Main genres</span>
-            </article>
-          </div>
-        </div>
-
-        <aside class="playlist-wrap">
-          <div class="playlist-head">
-            <h3>Playlist</h3>
-            <small>Updated weekly</small>
-          </div>
-          <ul class="playlist">
-            ${chillTracks
-              .map(
-                (track, idx) => `
-              <li class="${idx === 0 ? 'is-active' : ''}">
-                <div>
-                  <strong>${track.title}</strong>
-                  <span>${track.artist} · ${track.mood}</span>
-                </div>
-                <time>${track.length}</time>
-              </li>`
-              )
-              .join('')}
-          </ul>
-        </aside>
-      </div>
-    </section>
-  </div>
-`;
-
-const pageShell = document.getElementById('pageShell');
-const chillPanel = document.getElementById('chillPanel');
-const homeLink = document.getElementById('homeLink');
-const chillTabBtn = document.getElementById('chillTabBtn');
-
-const setRouteState = () => {
-  const route = window.location.hash || '#/';
-  const isChillPage = route === '#/chill';
-
-  pageShell?.classList.toggle('chill-mode', isChillPage);
-  chillPanel?.setAttribute('aria-hidden', String(!isChillPage));
-  homeLink?.classList.toggle('active', !isChillPage);
-  chillTabBtn?.classList.toggle('active-link', isChillPage);
+const pageConfigs = {
+  home: {
+    badge: 'Trang chủ',
+    title: 'Bringing Vision to <em>Life</em>',
+    lead: 'Nguyễn Văn Hoan · Professional Media Editor & Motion Designer',
+    text: 'Từ cinematic edits đến motion graphics, mình kể câu chuyện bằng hình ảnh rõ ràng, nghệ thuật và giàu cảm xúc.',
+    cards: [
+      ['Visual Storytelling', 'Xây dựng narrative có cảm xúc và rõ ràng.'],
+      ['Art Direction', 'Định hướng hình ảnh đồng bộ thương hiệu.'],
+      ['Motion & Edit', 'Kết hợp edit + motion cho video hiện đại.']
+    ]
+  },
+  about: {
+    badge: 'About',
+    title: 'Câu chuyện nghề của <em>Hoan</em>',
+    lead: 'Tập trung vào video thương hiệu, social content và short-form storytelling.',
+    text: 'Mình làm việc cùng creators và brands để biến brief thành sản phẩm chỉn chu: từ concept, nhịp dựng, màu sắc đến motion chi tiết.',
+    cards: [
+      ['6+ năm kinh nghiệm', 'Làm việc xuyên suốt nhiều ngách nội dung.'],
+      ['Quy trình rõ ràng', 'Brief → Scriptboard → Edit → Delivery.'],
+      ['Tinh thần cộng tác', 'Lắng nghe và tối ưu theo mục tiêu truyền thông.']
+    ]
+  },
+  showreel: {
+    badge: 'Showreel',
+    title: 'Tuyển tập các dự án <em>nổi bật</em>',
+    lead: 'Một không gian riêng để trình bày các sản phẩm motion/video tiêu biểu.',
+    text: 'Mỗi project được trình bày với mục tiêu, insight khán giả và cách mình xử lý hình ảnh để tạo sự khác biệt.',
+    cards: [
+      ['Brand Film', 'Video giới thiệu thương hiệu theo hướng cinematic.'],
+      ['Social Ads', 'Nội dung ngắn tối ưu attention trong 3 giây đầu.'],
+      ['Event Recap', 'Ghi lại năng lượng sự kiện qua nhịp dựng nhanh.']
+    ]
+  },
+  portfolio: {
+    badge: 'Portfolio',
+    title: 'Danh mục dự án theo <em>dịch vụ</em>',
+    lead: 'Tách rõ từng nhóm dịch vụ để khách hàng xem nhanh đúng nhu cầu.',
+    text: 'Bạn có thể duyệt theo nhóm Video Editing, Motion Graphics, Branding Visual và Color Grading.',
+    cards: [
+      ['Video Editing', 'Case study trước/sau khi dựng.'],
+      ['Motion Graphics', 'Typography, transitions, UI animation.'],
+      ['Color Grading', 'Mood màu phù hợp từng ngành hàng.']
+    ]
+  },
+  contact: {
+    badge: 'Contact',
+    title: 'Kết nối để bắt đầu dự án <em>mới</em>',
+    lead: 'Trang liên hệ riêng giúp khách hàng gửi yêu cầu nhanh hơn.',
+    text: 'Bạn có thể gửi mô tả ngắn về mục tiêu video, timeline và ngân sách để mình phản hồi proposal phù hợp.',
+    cards: [
+      ['Email', 'hoan.art.work@gmail.com'],
+      ['Zalo / Phone', '09xx xxx xxx'],
+      ['Thời gian phản hồi', 'Trong vòng 24 giờ làm việc.']
+    ]
+  }
 };
 
-window.addEventListener('hashchange', setRouteState);
-setRouteState();
+const getRouteKey = () => {
+  const hash = window.location.hash || '#/';
+  const match = routes.find((route) => route.hash === hash);
+  return match?.key || 'home';
+};
+
+const renderMenu = (activeRoute) =>
+  routes
+    .map((route) => {
+      const classNames = [route.className, route.key === activeRoute ? 'active' : ''].filter(Boolean).join(' ');
+      return `<a href="${route.hash}" class="${classNames}">${route.label}</a>`;
+    })
+    .join('');
+
+const renderStandardPage = (routeKey) => {
+  const page = pageConfigs[routeKey] || pageConfigs.home;
+  return `
+    <main class="single-page glass">
+      <p class="eyebrow">${page.badge}</p>
+      <h1>${page.title}</h1>
+      <p class="lead">${page.lead}</p>
+      <p class="sub">${page.text}</p>
+      <div class="page-cards">
+        ${page.cards
+          .map(
+            ([title, desc]) => `
+            <article class="panel glass">
+              <h3>${title}</h3>
+              <p>${desc}</p>
+            </article>`
+          )
+          .join('')}
+      </div>
+    </main>
+  `;
+};
+
+const renderChillPage = () => `
+  <section class="chill-panel" aria-hidden="false">
+    <div class="chill-layout">
+      <div>
+        <div class="chill-head">
+          <div>
+            <p class="badge">Music page</p>
+            <h2>Chill một chút</h2>
+            <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
+          </div>
+        </div>
+
+        <div class="now-playing">
+          <div class="cover-art"></div>
+          <div class="track-meta">
+            <strong>Midnight Breeze</strong>
+            <span>Lofi Harbor · Focus · Calm</span>
+            <div class="progress" aria-label="Playback progress"><i></i></div>
+            <div class="time-row"><small>1:14</small><small>3:42</small></div>
+          </div>
+        </div>
+
+        <div class="player-actions" aria-label="Player controls">
+          <button type="button" aria-label="Previous">⏮</button>
+          <button type="button" class="play" aria-label="Play">▶</button>
+          <button type="button" aria-label="Next">⏭</button>
+        </div>
+
+        <div class="chill-stats">
+          <article>
+            <strong>24</strong>
+            <span>Tracks curated</span>
+          </article>
+          <article>
+            <strong>02h 11m</strong>
+            <span>Total runtime</span>
+          </article>
+          <article>
+            <strong>Lo-fi / Ambient</strong>
+            <span>Main genres</span>
+          </article>
+        </div>
+      </div>
+
+      <aside class="playlist-wrap">
+        <div class="playlist-head">
+          <h3>Playlist</h3>
+          <small>Updated weekly</small>
+        </div>
+        <ul class="playlist">
+          ${chillTracks
+            .map(
+              (track, idx) => `
+            <li class="${idx === 0 ? 'is-active' : ''}">
+              <div>
+                <strong>${track.title}</strong>
+                <span>${track.artist} · ${track.mood}</span>
+              </div>
+              <time>${track.length}</time>
+            </li>`
+            )
+            .join('')}
+        </ul>
+      </aside>
+    </div>
+  </section>
+`;
+
+const renderApp = () => {
+  const routeKey = getRouteKey();
+  document.querySelector('#app').innerHTML = `
+    <div class="page-shell ${routeKey === 'chill' ? 'chill-mode' : ''}">
+      <div class="bg-glow bg-glow-1"></div>
+      <div class="bg-glow bg-glow-2"></div>
+
+      <header class="topbar glass">
+        <div class="brand">HOAN <span>ART</span></div>
+        <nav class="menu" aria-label="Top menu">${renderMenu(routeKey)}</nav>
+      </header>
+
+      ${routeKey === 'chill' ? renderChillPage() : renderStandardPage(routeKey)}
+    </div>
+  `;
+};
+
+window.addEventListener('hashchange', renderApp);
+renderApp();

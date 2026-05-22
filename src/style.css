@@ -148,3 +148,29 @@ h3 { margin-top: 4px; color: #f6f8ff; }
   .chill-stats { grid-template-columns: 1fr; }
   .now-playing { grid-template-columns: 1fr; }
 }
+
+
+.single-page {
+  padding: 28px;
+  border-radius: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.page-cards {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.page-cards .panel p { color: #c8cede; margin-bottom: 0; }
+
+.page-shell.chill-mode .bg-glow { display: none; }
+.page-shell.chill-mode { background: radial-gradient(circle at top right, #f8efe4 0%, #f7f2ec 45%, #efe7dc 100%); border-color: #e7d8c3; }
+.page-shell.chill-mode .topbar { margin-bottom: 16px; }
+.page-shell.chill-mode .chill-panel { display: block; width: 100%; }
+
+@media (max-width: 1100px) {
+  .page-cards { grid-template-columns: 1fr; }
+}

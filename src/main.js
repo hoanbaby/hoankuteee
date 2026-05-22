@@ -15,12 +15,12 @@ document.querySelector('#app').innerHTML = `
     <header class="topbar glass">
       <div class="brand">HOAN <span>ART</span></div>
       <nav class="menu" aria-label="Top menu">
-        <a href="#" class="active">Home</a>
+        <a id="homeLink" href="#/" class="active">Home</a>
         <a href="#">About</a>
         <a href="#">Showreel</a>
         <a href="#">Portfolio</a>
         <a href="#">Contact</a>
-        <button id="chillTabBtn" class="menu-chill" type="button">Chill một chút</button>
+        <a id="chillTabBtn" class="menu-chill" href="#/chill">Chill một chút</a>
       </nav>
     </header>
 
@@ -66,11 +66,11 @@ document.querySelector('#app').innerHTML = `
     <section id="chillPanel" class="chill-panel" aria-hidden="true">
       <div class="chill-head">
         <div>
-          <p class="badge">Music tab</p>
+          <p class="badge">Music page</p>
           <h2>Chill một chút</h2>
           <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
         </div>
-        <button id="closeChillBtn" type="button" aria-label="Đóng tab chill">×</button>
+        <a id="closeChillBtn" class="close-chill-link" href="#/" aria-label="Về trang chủ">×</a>
       </div>
 
       <div class="now-playing">
@@ -109,18 +109,18 @@ document.querySelector('#app').innerHTML = `
 
 const pageShell = document.getElementById('pageShell');
 const chillPanel = document.getElementById('chillPanel');
+const homeLink = document.getElementById('homeLink');
 const chillTabBtn = document.getElementById('chillTabBtn');
-const closeChillBtn = document.getElementById('closeChillBtn');
 
-const openChillTab = () => {
-  pageShell?.classList.add('chill-mode');
-  chillPanel?.setAttribute('aria-hidden', 'false');
+const setRouteState = () => {
+  const route = window.location.hash || '#/';
+  const isChillPage = route === '#/chill';
+
+  pageShell?.classList.toggle('chill-mode', isChillPage);
+  chillPanel?.setAttribute('aria-hidden', String(!isChillPage));
+  homeLink?.classList.toggle('active', !isChillPage);
+  chillTabBtn?.classList.toggle('active-link', isChillPage);
 };
 
-const closeChillTab = () => {
-  pageShell?.classList.remove('chill-mode');
-  chillPanel?.setAttribute('aria-hidden', 'true');
-};
-
-chillTabBtn?.addEventListener('click', openChillTab);
-closeChillBtn?.addEventListener('click', closeChillTab);
+window.addEventListener('hashchange', setRouteState);
+setRouteState();

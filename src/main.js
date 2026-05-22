@@ -1,183 +1,74 @@
 import './style.css';
 
-const api = {
-  async getPortfolio() {
-    const res = await fetch('/api/portfolio');
-    if (!res.ok) {
-      throw new Error('Không thể tải portfolio.');
-    }
-    return res.json();
-  },
-  async sendMessage(payload) {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      throw new Error('Gửi tin nhắn thất bại.');
-    }
-
-    return res.json();
-  }
-};
+const tracks = [
+  { title: 'Midnight City Lights', artist: 'Nova Waves', duration: '3:42', mood: 'Lofi House' },
+  { title: 'Coffee & Clouds', artist: 'Annie Rains', duration: '2:58', mood: 'Chillhop' },
+  { title: 'Dusk Drive', artist: 'Velvet Lane', duration: '4:05', mood: 'Synthwave' },
+  { title: 'Silent Seaside', artist: 'Kaito Bloom', duration: '3:24', mood: 'Ambient' },
+  { title: 'Neon Balcony', artist: 'Juno Y', duration: '3:11', mood: 'Indie Pop' }
+];
 
 document.querySelector('#app').innerHTML = `
-  <div class="page-shell">
-    <header class="topbar">
-      <div class="brand">HOAN <span>ART</span></div>
+  <div class="noise"></div>
+  <main class="music-page">
+    <header class="topbar glass">
+      <div class="brand">chill<span>.mood</span></div>
       <nav>
-        <a class="active" href="#">Home</a><a href="#about">chill một chút</a><a href="#portfolio">Portfolio</a><a href="#contact">Contact</a>
+        <a class="active" href="#">Khám phá</a>
+        <a href="#playlist">Playlist</a>
+        <a href="#vibes">Vibes</a>
       </nav>
+      <button class="icon-btn" aria-label="Profile">🎧</button>
     </header>
 
     <section class="hero">
-      <div class="hero-content">
-        <p class="eyebrow">MEDIA EDITOR & MOTION DESIGNER</p>
-        <h1>Bringing Vision to <em>Life</em></h1>
-        <p class="lead">Nguyễn Văn Hoan · Professional Media Editor & Motion Designer</p>
-        <p class="desc">Tôi biến ý tưởng thành visual stories điện ảnh, motion graphics và social content truyền cảm hứng.</p>
-        <div class="cta-row">
-          <button id="showreelBtn" class="gold" type="button">View Showreel</button>
-          <button id="contactBtn" class="ghost" type="button">Contact Me</button>
+      <div>
+        <p class="badge">NOW PLAYING · CHILL SESSION</p>
+        <h1>Không gian nghe nhạc hiện đại, chill đúng điệu.</h1>
+        <p class="sub">Thiết kế đậm chất 2026: gradient neon, glassmorphism và trải nghiệm mượt mà như app streaming.</p>
+        <div class="hero-actions">
+          <button class="primary">▶ Phát ngay</button>
+          <button class="ghost">＋ Thêm vào thư viện</button>
         </div>
       </div>
-      <div class="hero-photo">
-        <img src="https://images.unsplash.com/photo-1545167622-3a6ac756afa4?q=80&w=900&auto=format&fit=crop" alt="profile" />
+      <div class="player-card glass">
+        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop" alt="Album cover"/>
+        <div class="player-meta">
+          <strong>Moonlight Reflection</strong>
+          <span>by Luma Collective</span>
+        </div>
+        <div class="progress"><span></span></div>
+        <div class="player-controls"><button>⏮</button><button class="play">⏯</button><button>⏭</button></div>
       </div>
     </section>
 
-    <section id="about" class="grid-3">
-      <article class="card"><h3>SHOWREEL</h3><p>Highlight reel với storytelling mạnh mẽ, pacing cinematic và âm thanh cảm xúc.</p></article>
-      <article class="card"><h3>ABOUT ME</h3><p>5+ năm kinh nghiệm edit, color grading và motion graphics cho brand, creator và campaign.</p></article>
-      <article class="card"><h3>SKILLS & SERVICES</h3><ul><li>Video Editing</li><li>Motion Graphics</li><li>Color Grading</li><li>Branding</li></ul></article>
-    </section>
-
-    <section id="portfolio" class="portfolio-wrap card">
-      <div class="section-head"><h3>PORTFOLIO PREVIEW</h3><small id="portfolioCount"></small></div>
-      <div id="portfolioGrid" class="portfolio-grid"></div>
-    </section>
-
-    <section id="contact" class="contact card">
-      <div>
-        <h3>Have a project in mind?</h3>
-        <p>Gửi brief, mình sẽ phản hồi trong 24h.</p>
+    <section id="playlist" class="playlist glass">
+      <div class="section-head">
+        <h2>Daily Chill Playlist</h2>
+        <small>${tracks.length} bài hát</small>
       </div>
-      <form id="contactForm" class="contact-form">
-        <input name="name" required placeholder="Tên của bạn" />
-        <input name="email" required type="email" placeholder="Email" />
-        <textarea name="message" required placeholder="Mô tả dự án..."></textarea>
-        <button id="sendMessageBtn" class="gold" type="submit">Send Message</button>
-      </form>
-      <p id="status" class="status"></p>
+      <div class="track-list">
+        ${tracks
+          .map(
+            (track, index) => `
+            <article class="track">
+              <span class="idx">${String(index + 1).padStart(2, '0')}</span>
+              <div>
+                <strong>${track.title}</strong>
+                <p>${track.artist} · ${track.mood}</p>
+              </div>
+              <span class="duration">${track.duration}</span>
+            </article>
+          `
+          )
+          .join('')}
+      </div>
     </section>
-  </div>
+
+    <section id="vibes" class="vibes">
+      <article class="vibe-card glass"><h3>Lofi Focus</h3><p>Nhẹ nhàng, không lời, tối ưu khi làm việc.</p></article>
+      <article class="vibe-card glass"><h3>Night Drive</h3><p>Synthwave thành phố về đêm, đậm cinematic.</p></article>
+      <article class="vibe-card glass"><h3>Rainy Mood</h3><p>Ambient + tiếng mưa cho những ngày cần bình yên.</p></article>
+    </section>
+  </main>
 `;
-
-const portfolioGrid = document.getElementById('portfolioGrid');
-const portfolioCount = document.getElementById('portfolioCount');
-const contactForm = document.getElementById('contactForm');
-const statusEl = document.getElementById('status');
-const showreelBtn = document.getElementById('showreelBtn');
-const contactBtn = document.getElementById('contactBtn');
-const sendMessageBtn = document.getElementById('sendMessageBtn');
-const navLinks = document.querySelectorAll('.topbar nav a');
-
-function smoothScrollTo(targetId) {
-  const section = document.querySelector(targetId);
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-function setupNavigation() {
-  navLinks.forEach((link) => {
-    link.addEventListener('click', (event) => {
-      const href = link.getAttribute('href') || '#';
-      if (!href.startsWith('#')) return;
-
-      event.preventDefault();
-
-      navLinks.forEach((item) => item.classList.remove('active'));
-      link.classList.add('active');
-
-      if (href === '#') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-
-      smoothScrollTo(href);
-    });
-  });
-}
-
-function setupButtons() {
-  showreelBtn?.addEventListener('click', () => {
-    smoothScrollTo('#portfolio');
-    statusEl.textContent = 'Đang mở phần showreel/portfolio.';
-  });
-
-  contactBtn?.addEventListener('click', () => {
-    smoothScrollTo('#contact');
-    statusEl.textContent = 'Điền form để gửi yêu cầu của bạn nhé!';
-  });
-}
-
-async function loadPortfolio() {
-  try {
-    portfolioCount.textContent = 'Loading...';
-    const items = await api.getPortfolio();
-
-    portfolioCount.textContent = `${items.length} projects`;
-    portfolioGrid.innerHTML = items
-      .map(
-        (item) => `<article class="portfolio-item" tabindex="0" role="button" aria-label="${item.title}">
-            <img src="${item.thumbnail}" alt="${item.title}" />
-            <div class="overlay"><strong>${item.title}</strong><span>${item.category}</span></div>
-          </article>`
-      )
-      .join('');
-
-    portfolioGrid.querySelectorAll('.portfolio-item').forEach((card) => {
-      card.addEventListener('click', () => {
-        statusEl.textContent = `Bạn vừa chọn project: ${card.querySelector('strong')?.textContent || ''}`;
-      });
-
-      card.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          card.click();
-        }
-      });
-    });
-  } catch (error) {
-    portfolioCount.textContent = '0 projects';
-    portfolioGrid.innerHTML = '<p>Không tải được portfolio lúc này.</p>';
-    statusEl.textContent = error.message;
-  }
-}
-
-contactForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const payload = Object.fromEntries(new FormData(contactForm).entries());
-
-  try {
-    sendMessageBtn.disabled = true;
-    sendMessageBtn.textContent = 'Sending...';
-    statusEl.textContent = 'Đang gửi tin nhắn...';
-
-    const result = await api.sendMessage(payload);
-    statusEl.textContent = result.message || 'Đã gửi!';
-    contactForm.reset();
-  } catch (error) {
-    statusEl.textContent = error.message;
-  } finally {
-    sendMessageBtn.disabled = false;
-    sendMessageBtn.textContent = 'Send Message';
-  }
-});
-
-setupNavigation();
-setupButtons();
-loadPortfolio();

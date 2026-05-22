@@ -12,20 +12,6 @@ const portfolio = [
 
 const contacts = [];
 
-const chillTracks = [
-  { id: 1, title: 'Midnight Breeze', artist: 'Lofi Harbor', mood: 'Focus · Calm', length: '03:42', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { id: 2, title: 'Rain on Glass', artist: 'Slow Neon', mood: 'Rainy · Relax', length: '04:18', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { id: 3, title: 'Sunset Echo', artist: 'Cozy Tapes', mood: 'Warm · Acoustic', length: '02:56', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-  { id: 4, title: 'Night Ride', artist: 'City Pulse', mood: 'Urban · Dreamy', length: '03:25', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-  { id: 5, title: 'Cloud Notes', artist: 'Amber Keys', mood: 'Sleep · Soft', length: '05:01', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
-];
-
-const chillYoutube = [
-  { id: 1, title: 'Lofi Girl - beats to relax/study to', channel: 'Lofi Girl', youtubeUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk' },
-  { id: 2, title: 'Chillhop Radio - jazzy & lofi hip hop beats', channel: 'Chillhop Music', youtubeUrl: 'https://www.youtube.com/watch?v=5yx6BWlEVcY' },
-  { id: 3, title: 'Calm Piano - sleep & focus', channel: 'Soothing Relaxation', youtubeUrl: 'https://www.youtube.com/watch?v=sA9qJfV6WmE' }
-];
-
 const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'spa' });
 
 function json(res, status, data) {
@@ -33,21 +19,64 @@ function json(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
+function parseYoutubeId(input = '') {
+  if (!input) return null;
+  try {
+    const url = new URL(input);
+    if (url.hostname.includes('youtu.be')) return url.pathname.slice(1) || null;
+    if (url.hostname.includes('youtube.com')) return url.searchParams.get('v');
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+async function searchDeezer(keyword) {
+  const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(keyword)}`;
+  const response = await fetch(deezerUrl);
+  if (!response.ok) throw new Error('Không gọi được Deezer API.');
+  const payload = await response.json();
+  return (payload.data || []).slice(0, 10).map((item) => ({
+    id: item.id,
+    title: item.title,
+    artist: item.artist?.name || 'Unknown artist',
+    album: item.album?.title || 'Unknown album',
+    albumCover: item.album?.cover_medium || item.album?.cover || '',
+    preview: item.preview || '',
+    deezerUrl: item.link || '',
+    youtubeSearchQuery: `${item.title} ${item.artist?.name || ''} official music video`.trim(),
+    youtubeSearchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${item.title} ${item.artist?.name || ''} official music video`)}`
+  }));
+}
+
 const server = http.createServer(async (req, res) => {
   const requestUrl = new URL(req.url || '/', 'http://localhost:3000');
 
   if (req.method === 'GET' && requestUrl.pathname === '/api/portfolio') return json(res, 200, portfolio);
-
   if (req.method === 'GET' && requestUrl.pathname === '/api/contact') return json(res, 200, contacts);
 
-  if (req.method === 'GET' && requestUrl.pathname === '/api/chill-youtube') return json(res, 200, chillYoutube);
+  if (req.method === 'GET' && requestUrl.pathname === '/api/deezer-search') {
+    const keyword = requestUrl.searchParams.get('q')?.trim();
+    if (!keyword) return json(res, 400, { message: 'Thiếu từ khóa tìm bài hát.' });
+    try {
+      const items = await searchDeezer(keyword);
+      return json(res, 200, items);
+    } catch (error) {
+      return json(res, 502, { message: error.message || 'Lỗi khi gọi Deezer API.' });
+    }
+  }
 
-  if (req.method === 'GET' && requestUrl.pathname === '/api/chill-tracks') {
-    const keyword = requestUrl.searchParams.get('q')?.trim().toLowerCase() || '';
-    const filtered = keyword
-      ? chillTracks.filter((track) => `${track.title} ${track.artist} ${track.mood}`.toLowerCase().includes(keyword))
-      : chillTracks;
-    return json(res, 200, filtered);
+  if (req.method === 'GET' && requestUrl.pathname === '/api/youtube-embed') {
+    const input = requestUrl.searchParams.get('url')?.trim() || '';
+    const query = requestUrl.searchParams.get('q')?.trim() || '';
+    const videoId = parseYoutubeId(input);
+    if (videoId) return json(res, 200, { embedUrl: `https://www.youtube.com/embed/${videoId}`, source: 'url' });
+
+    return json(res, 200, {
+      embedUrl: '',
+      source: query ? 'search' : 'empty',
+      searchUrl: query ? `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}` : ''
+    });
   }
 
   if (req.method === 'POST' && requestUrl.pathname === '/api/contact') {

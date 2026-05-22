@@ -43,24 +43,33 @@ h1 em { color: #d4a164; font-style: italic; font-weight: 500; }
 .skills ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 8px; }
 
 .chill-panel {
-  position: absolute;
-  right: 22px;
-  top: 88px;
-  width: min(420px, calc(100% - 44px));
+  display: none;
+  width: min(460px, 100%);
   border: 1px solid #1a2336;
   background: radial-gradient(circle at top, #253552 0%, #111a2d 58%, #0b1222 100%);
   color: #eff4ff;
   border-radius: 20px;
   padding: 16px;
   box-shadow: 0 24px 34px rgba(10, 17, 34, 0.45);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-10px) scale(.98);
-  transition: .25s ease;
-  z-index: 10;
 }
 
-.chill-panel.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+.page-shell.chill-mode .topbar,
+.page-shell.chill-mode .content-grid {
+  display: none;
+}
+
+.page-shell.chill-mode {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 36px);
+  background: radial-gradient(circle at top, #253552 0%, #111a2d 58%, #0b1222 100%);
+  border-color: #1a2336;
+}
+
+.page-shell.chill-mode .chill-panel {
+  display: block;
+}
+
 .chill-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
 .badge {
   margin: 0;

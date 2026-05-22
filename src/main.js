@@ -28,7 +28,7 @@ const chillTracks = [
 ];
 
 document.querySelector('#app').innerHTML = `
-  <div class="page-shell">
+  <div id="pageShell" class="page-shell">
     <header class="topbar">
       <div class="brand">HOAN <span>ART</span></div>
       <nav class="menu" aria-label="Top menu">
@@ -121,16 +121,20 @@ document.querySelector('#app').innerHTML = `
   </div>
 `;
 
+const pageShell = document.getElementById('pageShell');
 const chillPanel = document.getElementById('chillPanel');
 const chillTabBtn = document.getElementById('chillTabBtn');
 const closeChillBtn = document.getElementById('closeChillBtn');
 
-chillTabBtn?.addEventListener('click', () => {
-  chillPanel?.classList.add('open');
+const openChillTab = () => {
+  pageShell?.classList.add('chill-mode');
   chillPanel?.setAttribute('aria-hidden', 'false');
-});
+};
 
-closeChillBtn?.addEventListener('click', () => {
-  chillPanel?.classList.remove('open');
+const closeChillTab = () => {
+  pageShell?.classList.remove('chill-mode');
   chillPanel?.setAttribute('aria-hidden', 'true');
-});
+};
+
+chillTabBtn?.addEventListener('click', openChillTab);
+closeChillBtn?.addEventListener('click', closeChillTab);

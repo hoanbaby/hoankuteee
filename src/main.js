@@ -4,7 +4,8 @@ const chillTracks = [
   { title: 'Midnight Breeze', artist: 'Lofi Harbor', mood: 'Focus · Calm', length: '03:42' },
   { title: 'Rain on Glass', artist: 'Slow Neon', mood: 'Rainy · Relax', length: '04:18' },
   { title: 'Sunset Echo', artist: 'Cozy Tapes', mood: 'Warm · Acoustic', length: '02:56' },
-  { title: 'Night Ride', artist: 'City Pulse', mood: 'Urban · Dreamy', length: '03:25' }
+  { title: 'Night Ride', artist: 'City Pulse', mood: 'Urban · Dreamy', length: '03:25' },
+  { title: 'Cloud Notes', artist: 'Amber Keys', mood: 'Sleep · Soft', length: '05:01' }
 ];
 
 document.querySelector('#app').innerHTML = `
@@ -64,45 +65,70 @@ document.querySelector('#app').innerHTML = `
     </main>
 
     <section id="chillPanel" class="chill-panel" aria-hidden="true">
-      <div class="chill-head">
+      <div class="chill-layout">
         <div>
-          <p class="badge">Music page</p>
-          <h2>Chill một chút</h2>
-          <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
-        </div>
-        <a id="closeChillBtn" class="close-chill-link" href="#/" aria-label="Về trang chủ">×</a>
-      </div>
-
-      <div class="now-playing">
-        <div class="cover-art"></div>
-        <div class="track-meta">
-          <strong>Midnight Breeze</strong>
-          <span>Lofi Harbor</span>
-          <div class="progress"><i></i></div>
-          <div class="time-row"><small>1:14</small><small>3:42</small></div>
-        </div>
-      </div>
-
-      <div class="player-actions" aria-label="Player controls">
-        <button type="button">⏮</button>
-        <button type="button" class="play">▶</button>
-        <button type="button">⏭</button>
-      </div>
-
-      <ul class="playlist">
-        ${chillTracks
-          .map(
-            (track, idx) => `
-          <li class="${idx === 0 ? 'is-active' : ''}">
+          <div class="chill-head">
             <div>
-              <strong>${track.title}</strong>
-              <span>${track.artist} · ${track.mood}</span>
+              <p class="badge">Music page</p>
+              <h2>Chill một chút</h2>
+              <p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p>
             </div>
-            <time>${track.length}</time>
-          </li>`
-          )
-          .join('')}
-      </ul>
+            <a id="closeChillBtn" class="close-chill-link" href="#/" aria-label="Về trang chủ">×</a>
+          </div>
+
+          <div class="now-playing">
+            <div class="cover-art"></div>
+            <div class="track-meta">
+              <strong>Midnight Breeze</strong>
+              <span>Lofi Harbor · Focus · Calm</span>
+              <div class="progress" aria-label="Playback progress"><i></i></div>
+              <div class="time-row"><small>1:14</small><small>3:42</small></div>
+            </div>
+          </div>
+
+          <div class="player-actions" aria-label="Player controls">
+            <button type="button" aria-label="Previous">⏮</button>
+            <button type="button" class="play" aria-label="Play">▶</button>
+            <button type="button" aria-label="Next">⏭</button>
+          </div>
+
+          <div class="chill-stats">
+            <article>
+              <strong>24</strong>
+              <span>Tracks curated</span>
+            </article>
+            <article>
+              <strong>02h 11m</strong>
+              <span>Total runtime</span>
+            </article>
+            <article>
+              <strong>Lo-fi / Ambient</strong>
+              <span>Main genres</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="playlist-wrap">
+          <div class="playlist-head">
+            <h3>Playlist</h3>
+            <small>Updated weekly</small>
+          </div>
+          <ul class="playlist">
+            ${chillTracks
+              .map(
+                (track, idx) => `
+              <li class="${idx === 0 ? 'is-active' : ''}">
+                <div>
+                  <strong>${track.title}</strong>
+                  <span>${track.artist} · ${track.mood}</span>
+                </div>
+                <time>${track.length}</time>
+              </li>`
+              )
+              .join('')}
+          </ul>
+        </aside>
+      </div>
     </section>
   </div>
 `;

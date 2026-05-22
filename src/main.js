@@ -28,7 +28,7 @@ document.querySelector('#app').innerHTML = `
     <header class="topbar">
       <div class="brand">HOAN <span>ART</span></div>
       <nav>
-        <a class="active" href="#">Home</a><a href="#about">About</a><a href="#portfolio">Portfolio</a><a href="#contact">Contact</a>
+        <a class="active" href="#">Home</a><a href="#about">chill một chút</a><a href="#portfolio">Portfolio</a><a href="#contact">Contact</a>
       </nav>
     </header>
 

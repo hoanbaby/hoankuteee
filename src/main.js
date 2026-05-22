@@ -1,108 +1,96 @@
 import './style.css';
 
-const STORAGE_KEY = 'booking-web-app';
-
-const services = [
-  { id: 1, name: 'Khám tổng quát', duration: 30 },
-  { id: 2, name: 'Nha khoa', duration: 45 },
-  { id: 3, name: 'Tư vấn dinh dưỡng', duration: 60 }
-];
-
-document.querySelector('#app').innerHTML = `
-  <main class="container">
-    <header>
-      <h1>Booking Web (Full-stack Demo)</h1>
-      <p>Frontend Vite + backend mô phỏng bằng localStorage API.</p>
-    </header>
-
-    <section class="card">
-      <h2>Tạo lịch hẹn</h2>
-      <form id="bookingForm" class="form-grid">
-        <label>Họ tên<input name="customerName" required placeholder="Nguyễn Văn A" /></label>
-        <label>Số điện thoại<input name="phone" required placeholder="0901234567" /></label>
-        <label>Dịch vụ<select name="serviceId" id="serviceSelect" required></select></label>
-        <label>Thời gian hẹn<input type="datetime-local" name="appointmentTime" required /></label>
-        <button type="submit">Đặt lịch</button>
-      </form>
-      <p id="status" class="status"></p>
-    </section>
-
-    <section class="card">
-      <h2>Danh sách lịch hẹn</h2>
-      <ul id="bookingList" class="booking-list"></ul>
-    </section>
-  </main>
-`;
-
-const bookingForm = document.getElementById('bookingForm');
-const serviceSelect = document.getElementById('serviceSelect');
-const bookingList = document.getElementById('bookingList');
-const statusEl = document.getElementById('status');
-
-const db = {
-  getBookings() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+const api = {
+  async getPortfolio() {
+    const res = await fetch('/api/portfolio');
+    return res.json();
   },
-  saveBookings(bookings) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-  },
-  createBooking(payload) {
-    const bookings = this.getBookings();
-    const service = services.find((item) => item.id === Number(payload.serviceId));
-    const booking = {
-      id: Date.now(),
-      customerName: payload.customerName,
-      phone: payload.phone,
-      appointmentTime: payload.appointmentTime,
-      serviceName: service?.name || 'Khác'
-    };
-    bookings.push(booking);
-    this.saveBookings(bookings);
-  },
-  deleteBooking(id) {
-    const bookings = this.getBookings().filter((item) => item.id !== id);
-    this.saveBookings(bookings);
+  async sendMessage(payload) {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
   }
 };
 
-function loadServices() {
-  serviceSelect.innerHTML = services
-    .map((service) => `<option value="${service.id}">${service.name} (${service.duration} phút)</option>`)
+document.querySelector('#app').innerHTML = `
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">HOAN <span>ART</span></div>
+      <nav>
+        <a class="active" href="#">Home</a><a href="#about">About</a><a href="#portfolio">Portfolio</a><a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">MEDIA EDITOR & MOTION DESIGNER</p>
+        <h1>Bringing Vision to <em>Life</em></h1>
+        <p class="lead">Nguyễn Văn Hoan · Professional Media Editor & Motion Designer</p>
+        <p class="desc">Tôi biến ý tưởng thành visual stories điện ảnh, motion graphics và social content truyền cảm hứng.</p>
+        <div class="cta-row">
+          <button class="gold">View Showreel</button>
+          <button class="ghost">Contact Me</button>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="https://images.unsplash.com/photo-1545167622-3a6ac756afa4?q=80&w=900&auto=format&fit=crop" alt="profile" />
+      </div>
+    </section>
+
+    <section id="about" class="grid-3">
+      <article class="card"><h3>SHOWREEL</h3><p>Highlight reel với storytelling mạnh mẽ, pacing cinematic và âm thanh cảm xúc.</p></article>
+      <article class="card"><h3>ABOUT ME</h3><p>5+ năm kinh nghiệm edit, color grading và motion graphics cho brand, creator và campaign.</p></article>
+      <article class="card"><h3>SKILLS & SERVICES</h3><ul><li>Video Editing</li><li>Motion Graphics</li><li>Color Grading</li><li>Branding</li></ul></article>
+    </section>
+
+    <section id="portfolio" class="portfolio-wrap card">
+      <div class="section-head"><h3>PORTFOLIO PREVIEW</h3><small id="portfolioCount"></small></div>
+      <div id="portfolioGrid" class="portfolio-grid"></div>
+    </section>
+
+    <section id="contact" class="contact card">
+      <div>
+        <h3>Have a project in mind?</h3>
+        <p>Gửi brief, mình sẽ phản hồi trong 24h.</p>
+      </div>
+      <form id="contactForm" class="contact-form">
+        <input name="name" required placeholder="Tên của bạn" />
+        <input name="email" required type="email" placeholder="Email" />
+        <textarea name="message" required placeholder="Mô tả dự án..."></textarea>
+        <button class="gold" type="submit">Send Message</button>
+      </form>
+      <p id="status" class="status"></p>
+    </section>
+  </div>
+`;
+
+const portfolioGrid = document.getElementById('portfolioGrid');
+const portfolioCount = document.getElementById('portfolioCount');
+const contactForm = document.getElementById('contactForm');
+const statusEl = document.getElementById('status');
+
+async function loadPortfolio() {
+  const items = await api.getPortfolio();
+  portfolioCount.textContent = `${items.length} projects`;
+  portfolioGrid.innerHTML = items
+    .map(
+      (item) => `<article class="portfolio-item">
+          <img src="${item.thumbnail}" alt="${item.title}" />
+          <div class="overlay"><strong>${item.title}</strong><span>${item.category}</span></div>
+        </article>`
+    )
     .join('');
 }
 
-function renderBookings() {
-  const bookings = db.getBookings();
-  bookingList.innerHTML = bookings.length
-    ? bookings
-        .map(
-          (booking) => `<li>
-              <div>
-                <strong>${booking.customerName}</strong> - ${booking.serviceName}<br />
-                <small>${booking.phone} • ${new Date(booking.appointmentTime).toLocaleString('vi-VN')}</small>
-              </div>
-              <button data-id="${booking.id}" class="delete-btn">Hủy</button>
-            </li>`
-        )
-        .join('')
-    : '<li>Chưa có lịch hẹn nào.</li>';
-}
-
-bookingForm.addEventListener('submit', (event) => {
+contactForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const formData = new FormData(bookingForm);
-  db.createBooking(Object.fromEntries(formData.entries()));
-  bookingForm.reset();
-  statusEl.textContent = 'Đặt lịch thành công!';
-  renderBookings();
+  const payload = Object.fromEntries(new FormData(contactForm).entries());
+  const result = await api.sendMessage(payload);
+  statusEl.textContent = result.message || 'Đã gửi!';
+  contactForm.reset();
 });
 
-bookingList.addEventListener('click', (event) => {
-  const button = event.target.closest('.delete-btn');
-  if (!button) return;
-  db.deleteBooking(Number(button.dataset.id));
-  renderBookings();
-});
-
-loadServices();
-renderBookings();
+loadPortfolio();

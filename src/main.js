@@ -37,6 +37,36 @@ const renderTrackList = () => {
   return `<ul class="playlist">${musicState.items.map((track, idx) => `<li data-track-index="${idx}" class="${idx === musicState.currentIndex ? 'is-active' : ''}"><div class="track-info"><strong>${track.title}</strong><span>${track.artist} · ${track.album}</span></div><time>Preview 30s</time></li>`).join('')}</ul>`;
 };
 
+const loadZingChart = async () => {
+  musicState.loading = true;
+  musicState.error = '';
+  musicState.keyword = 'Zing Chart';
+  renderApp();
+  try {
+    const res = await fetch('/api/zing-chart');
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.message || 'Không tải được Zing Chart.');
+    musicState.items = payload.map((item) => ({
+      id: item.id,
+      title: `#${item.rank} ${item.title}`,
+      artist: item.artist,
+      album: `Điểm: ${item.score}`,
+      albumCover: item.thumbnail,
+      preview: '',
+      youtubeSearchQuery: `${item.title} ${item.artist} official music video`.trim(),
+      youtubeSearchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${item.title} ${item.artist} official music video`)}`
+    }));
+    musicState.currentIndex = 0;
+    const first = musicState.items[0];
+    if (first) musicState.youtubeSearchUrl = first.youtubeSearchUrl;
+  } catch (error) {
+    musicState.error = error.message;
+  } finally {
+    musicState.loading = false;
+    renderApp();
+  }
+};
+
 const searchSongs = async (keyword) => {
   musicState.loading = true;
   musicState.error = '';
@@ -72,13 +102,14 @@ const renderYoutubeSection = () => {
 
 const renderChillPanel = () => {
   const current = getCurrentTrack();
-  return `<section class="chill-panel"><div class="chill-layout"><div><div class="chill-head"><div><p class="badge">Music page</p><h2>Tìm bài hát & nghe thử 30 giây</h2><p class="chill-sub">Web gọi Deezer API lấy tên bài, ca sĩ, ảnh album và preview 30s.</p></div><a class="btn-home" href="#/">← Về trang chủ</a></div><div class="search-row"><input id="track-search" type="text" placeholder="Ví dụ: Sơn Tùng M-TP" value="${musicState.keyword}"><button id="search-btn" type="button">Tìm</button></div><div class="now-playing"><div class="cover-art" style="background-image:url('${current?.albumCover || ''}'); background-size:cover; background-position:center;"></div><div class="track-meta"><strong>${current?.title || 'Chưa chọn bài'}</strong><span>${current ? `${current.artist} · ${current.album}` : 'Tìm bài để xem kết quả từ Deezer.'}</span><audio id="chill-audio" controls ${current?.preview ? `src="${current.preview}"` : ''}></audio></div></div>${renderYoutubeSection()}</div><aside class="playlist-wrap"><div class="playlist-head"><h3>Kết quả từ Deezer</h3><small>Preview 30 giây</small></div>${renderTrackList()}</aside></div></section>`;
+  return `<section class="chill-panel"><div class="chill-layout"><div><div class="chill-head"><div><p class="badge">Music page</p><h2>Tìm bài hát & nghe thử 30 giây</h2><p class="chill-sub">Web gọi Deezer API lấy tên bài, ca sĩ, ảnh album và preview 30s.</p></div><a class="btn-home" href="#/">← Về trang chủ</a></div><div class="search-row"><input id="track-search" type="text" placeholder="Ví dụ: Sơn Tùng M-TP" value="${musicState.keyword}"><button id="search-btn" type="button">Tìm</button><button id="zing-chart-btn" type="button">Top Zing</button></div><div class="now-playing"><div class="cover-art" style="background-image:url('${current?.albumCover || ''}'); background-size:cover; background-position:center;"></div><div class="track-meta"><strong>${current?.title || 'Chưa chọn bài'}</strong><span>${current ? `${current.artist} · ${current.album}` : 'Tìm bài để xem kết quả từ Deezer.'}</span><audio id="chill-audio" controls ${current?.preview ? `src="${current.preview}"` : ''}></audio></div></div>${renderYoutubeSection()}</div><aside class="playlist-wrap"><div class="playlist-head"><h3>Kết quả từ Deezer</h3><small>Preview 30 giây</small></div>${renderTrackList()}</aside></div></section>`;
 };
 
 const bindChillEvents = () => {
   const searchBtn = document.querySelector('#search-btn');
   const input = document.querySelector('#track-search');
   searchBtn?.addEventListener('click', () => searchSongs(input?.value?.trim() || ''));
+  document.querySelector('#zing-chart-btn')?.addEventListener('click', () => loadZingChart());
   input?.addEventListener('keydown', (event) => { if (event.key === 'Enter') searchSongs(input.value.trim()); });
 
   document.querySelectorAll('[data-track-index]').forEach((item) => item.addEventListener('click', () => {

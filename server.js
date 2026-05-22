@@ -31,6 +31,35 @@ function parseYoutubeId(input = '') {
   return null;
 }
 
+
+
+async function getZingChartTop() {
+  const response = await fetch('https://zingmp3.vn/zing-chart', {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; HoanArtBot/1.0)',
+      Accept: 'text/html'
+    }
+  });
+  if (!response.ok) throw new Error('Không truy cập được Zing Chart.');
+  const html = await response.text();
+  const chartSection = html.match(/\"RTChart\"\s*:\s*\{[\s\S]*?\"items\"\s*:\s*\[(.*?)\]\s*,\s*\"sectionType\"/);
+  if (!chartSection) throw new Error('Không tách được dữ liệu bảng xếp hạng từ Zing Chart.');
+
+  const itemMatches = [...chartSection[1].matchAll(/\{\"encodeId\":\"(.*?)\"[\s\S]*?\"title\":\"(.*?)\"[\s\S]*?\"artistsNames\":\"(.*?)\"[\s\S]*?\"thumbnailM\":\"(.*?)\"[\s\S]*?\"score\":(\d+)/g)];
+
+  const items = itemMatches.slice(0, 20).map((match, index) => ({
+    rank: index + 1,
+    id: match[1],
+    title: JSON.parse(`"${match[2]}"`),
+    artist: JSON.parse(`"${match[3]}"`),
+    thumbnail: JSON.parse(`"${match[4]}"`),
+    score: Number(match[5])
+  }));
+
+  if (!items.length) throw new Error('Không có dữ liệu top bài hát từ Zing Chart.');
+  return items;
+}
+
 async function searchDeezer(keyword) {
   const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(keyword)}`;
   const response = await fetch(deezerUrl);
@@ -54,6 +83,15 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && requestUrl.pathname === '/api/portfolio') return json(res, 200, portfolio);
   if (req.method === 'GET' && requestUrl.pathname === '/api/contact') return json(res, 200, contacts);
+
+  if (req.method === 'GET' && requestUrl.pathname === '/api/zing-chart') {
+    try {
+      const items = await getZingChartTop();
+      return json(res, 200, items);
+    } catch (error) {
+      return json(res, 502, { message: error.message || 'Lỗi khi lấy bảng xếp hạng Zing.' });
+    }
+  }
 
   if (req.method === 'GET' && requestUrl.pathname === '/api/deezer-search') {
     const keyword = requestUrl.searchParams.get('q')?.trim();

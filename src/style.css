@@ -102,3 +102,10 @@ h1 em { font-family: 'Playfair Display', serif; color:#d6a56a; font-style: itali
   h1 { font-size: 56px; }
   .services-grid article { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.08); }
 }
+
+.btn-home { text-decoration:none; border:1px solid #e2cfb9; border-radius:999px; padding:8px 12px; color:#5f4832; font-weight:700; background:#fff7ef; }
+.search-row { display:flex; gap:10px; margin:12px 0; }
+.search-row input { flex:1; border:1px solid #e2cfb9; border-radius:10px; padding:10px; font: inherit; }
+.search-row button { border:1px solid #d6b796; border-radius:10px; padding:10px 14px; background:#d9b184; color:white; font-weight:700; }
+.track-meta audio { margin-top:8px; width:100%; }
+.chill-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }

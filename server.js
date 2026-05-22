@@ -12,11 +12,20 @@ const portfolio = [
 
 const contacts = [];
 
+const chillTracks = [
+  { id: 1, title: 'Midnight Breeze', artist: 'Lofi Harbor', mood: 'Focus · Calm', length: '03:42', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+  { id: 2, title: 'Rain on Glass', artist: 'Slow Neon', mood: 'Rainy · Relax', length: '04:18', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { id: 3, title: 'Sunset Echo', artist: 'Cozy Tapes', mood: 'Warm · Acoustic', length: '02:56', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  { id: 4, title: 'Night Ride', artist: 'City Pulse', mood: 'Urban · Dreamy', length: '03:25', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+  { id: 5, title: 'Cloud Notes', artist: 'Amber Keys', mood: 'Sleep · Soft', length: '05:01', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
+];
+
 const chillYoutube = [
   { id: 1, title: 'Lofi Girl - beats to relax/study to', channel: 'Lofi Girl', youtubeUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk' },
   { id: 2, title: 'Chillhop Radio - jazzy & lofi hip hop beats', channel: 'Chillhop Music', youtubeUrl: 'https://www.youtube.com/watch?v=5yx6BWlEVcY' },
   { id: 3, title: 'Calm Piano - sleep & focus', channel: 'Soothing Relaxation', youtubeUrl: 'https://www.youtube.com/watch?v=sA9qJfV6WmE' }
 ];
+
 const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'spa' });
 
 function json(res, status, data) {
@@ -25,15 +34,23 @@ function json(res, status, data) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const url = req.url || '';
+  const requestUrl = new URL(req.url || '/', 'http://localhost:3000');
 
-  if (req.method === 'GET' && url === '/api/portfolio') return json(res, 200, portfolio);
+  if (req.method === 'GET' && requestUrl.pathname === '/api/portfolio') return json(res, 200, portfolio);
 
-  if (req.method === 'GET' && url === '/api/contact') return json(res, 200, contacts);
+  if (req.method === 'GET' && requestUrl.pathname === '/api/contact') return json(res, 200, contacts);
 
-  if (req.method === 'GET' && url === '/api/chill-youtube') return json(res, 200, chillYoutube);
+  if (req.method === 'GET' && requestUrl.pathname === '/api/chill-youtube') return json(res, 200, chillYoutube);
 
-  if (req.method === 'POST' && url === '/api/contact') {
+  if (req.method === 'GET' && requestUrl.pathname === '/api/chill-tracks') {
+    const keyword = requestUrl.searchParams.get('q')?.trim().toLowerCase() || '';
+    const filtered = keyword
+      ? chillTracks.filter((track) => `${track.title} ${track.artist} ${track.mood}`.toLowerCase().includes(keyword))
+      : chillTracks;
+    return json(res, 200, filtered);
+  }
+
+  if (req.method === 'POST' && requestUrl.pathname === '/api/contact') {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk;

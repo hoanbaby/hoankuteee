@@ -1,62 +1,18 @@
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-  background: #f4f6fb;
-  color: #1f2937;
-}
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 16px;
-}
-header h1 { margin-bottom: 8px; }
-.back-home {
-  display: inline-block;
-  margin-bottom: 12px;
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-.back-home:hover { text-decoration: underline; }
-.card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,.06);
-}
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
-input, select, button {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-}
-button {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-.form-grid button { grid-column: span 2; }
-.booking-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-.booking-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-}
-.delete-btn { background: #dc2626; }
-.status { min-height: 20px; color: #15803d; margin: 10px 0 0; }
-@media (max-width: 640px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .form-grid button { grid-column: span 1; }
-}
+:root{--bg:#f6f6f7;--card:#fff;--ink:#181b26;--muted:#666a73;--gold:#cca06a;}
+*{box-sizing:border-box}body{margin:0;font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+.page-shell{max-width:1280px;margin:20px auto;padding:18px;border:1px solid #e7e7e7;border-radius:20px;background:#fcfcfd}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 18px}.brand{font-size:36px;font-weight:800}.brand span{color:var(--gold)}
+nav{display:flex;gap:28px}nav a{text-decoration:none;color:#262a33;font-weight:500}nav a.active{border-bottom:2px solid var(--gold)}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center}
+.eyebrow{letter-spacing:3px;color:#a88bd6}.hero h1{font-size:72px;line-height:1.01;margin:8px 0}.hero h1 em{font-family:"Playfair Display",serif;color:var(--gold);font-weight:500}
+.lead{font-weight:600;margin:0 0 10px}.desc{color:var(--muted);max-width:640px}.cta-row{display:flex;gap:12px;margin-top:18px}
+button{border:1px solid #d4d4d4;border-radius:10px;padding:12px 20px;font-weight:600;background:#fff;cursor:pointer}.gold{background:var(--gold);color:#fff;border:none}.ghost{background:transparent}
+.hero-photo{border-radius:28px;overflow:hidden;border:1px solid #ece9e4;height:400px}.hero-photo img{width:100%;height:100%;object-fit:cover}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.card{background:var(--card);border:1px solid #ececec;border-radius:14px;padding:18px}
+.card h3{letter-spacing:2px;font-size:16px;margin:0 0 12px}.card p{margin:0;color:#4d515b;line-height:1.5}ul{padding-left:20px;margin:0;line-height:1.8}
+.portfolio-wrap{margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.portfolio-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.portfolio-item{position:relative;border-radius:12px;overflow:hidden;height:130px}
+.portfolio-item img{width:100%;height:100%;object-fit:cover;filter:saturate(1.05)}.overlay{position:absolute;inset:auto 0 0 0;padding:10px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;display:flex;flex-direction:column}
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;margin-top:14px}.contact-form{display:grid;gap:10px}
+input,textarea{border:1px solid #ddd;border-radius:10px;padding:10px;font:inherit}textarea{min-height:80px}.status{grid-column:1/-1;color:#0d7f46;min-height:20px}
+@media (max-width:1000px){.hero{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.portfolio-grid{grid-template-columns:repeat(2,1fr)}.contact{grid-template-columns:1fr}.hero h1{font-size:52px}}

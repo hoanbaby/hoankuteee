@@ -8,6 +8,8 @@ const chillTracks = [
   { title: 'Cloud Notes', artist: 'Amber Keys', mood: 'Sleep · Soft', length: '05:01' }
 ];
 
+const chillYoutubeState = { loading: false, items: [], error: '' };
+
 const routes = [
   { key: 'home', label: 'Home', hash: '#/' },
   { key: 'about', label: 'About', hash: '#/about' },
@@ -116,13 +118,37 @@ const renderStandardPage = (routeKey) => {
 
 const renderChillPage = () => `...`;
 
+const renderYoutubeList = () => {
+  if (chillYoutubeState.loading) return '<p class="youtube-state">Đang tải playlist YouTube...</p>';
+  if (chillYoutubeState.error) return `<p class="youtube-state error">${chillYoutubeState.error}</p>`;
+  if (!chillYoutubeState.items.length) return '<p class="youtube-state">Chưa có playlist nào.</p>';
+  return `<ul class="youtube-list">${chillYoutubeState.items.map((item) => `<li><div><strong>${item.title}</strong><span>${item.channel}</span></div><a href="${item.youtubeUrl}" target="_blank" rel="noreferrer">Mở YouTube</a></li>`).join('')}</ul>`;
+};
+
+const loadChillYoutube = async () => {
+  chillYoutubeState.loading = true;
+  chillYoutubeState.error = '';
+  renderApp();
+  try {
+    const res = await fetch('/api/chill-youtube');
+    if (!res.ok) throw new Error('Không thể tải API YouTube.');
+    chillYoutubeState.items = await res.json();
+  } catch (error) {
+    chillYoutubeState.error = error.message;
+  } finally {
+    chillYoutubeState.loading = false;
+    renderApp();
+  }
+};
+
 const renderChillPanel = () => `
   <section class="chill-panel" aria-hidden="false">
     <div class="chill-layout"><div><div class="chill-head"><div><p class="badge">Music page</p><h2>Chill một chút</h2><p class="chill-sub">Không gian nghe nhạc tối giản, hiện đại và đồng bộ màu với giao diện trang chủ.</p></div></div>
     <div class="now-playing"><div class="cover-art"></div><div class="track-meta"><strong>Midnight Breeze</strong><span>Lofi Harbor · Focus · Calm</span><div class="progress" aria-label="Playback progress"><i></i></div><div class="time-row"><small>1:14</small><small>3:42</small></div></div></div>
     <div class="player-actions" aria-label="Player controls"><button type="button" aria-label="Previous">⏮</button><button type="button" class="play" aria-label="Play">▶</button><button type="button" aria-label="Next">⏭</button></div>
     <div class="chill-stats"><article><strong>24</strong><span>Tracks curated</span></article><article><strong>02h 11m</strong><span>Total runtime</span></article><article><strong>Lo-fi / Ambient</strong><span>Main genres</span></article></div></div>
-    <aside class="playlist-wrap"><div class="playlist-head"><h3>Playlist</h3><small>Updated weekly</small></div><ul class="playlist">${chillTracks.map((track, idx) => `<li class="${idx === 0 ? 'is-active' : ''}"><div><strong>${track.title}</strong><span>${track.artist} · ${track.mood}</span></div><time>${track.length}</time></li>`).join('')}</ul></aside></div>
+    <aside class="playlist-wrap"><div class="playlist-head"><h3>Playlist</h3><small>Updated weekly</small></div><ul class="playlist">${chillTracks.map((track, idx) => `<li class="${idx === 0 ? 'is-active' : ''}"><div><strong>${track.title}</strong><span>${track.artist} · ${track.mood}</span></div><time>${track.length}</time></li>`).join('')}</ul>
+    <div class="youtube-block"><h3>YouTube 1-click</h3>${renderYoutubeList()}</div></aside></div>
   </section>
 `;
 
@@ -136,5 +162,9 @@ const renderApp = () => {
     </div>`;
 };
 
-window.addEventListener('hashchange', renderApp);
+window.addEventListener('hashchange', () => {
+  renderApp();
+  if (getRouteKey() === 'chill' && !chillYoutubeState.items.length && !chillYoutubeState.loading) loadChillYoutube();
+});
 renderApp();
+if (getRouteKey() === 'chill') loadChillYoutube();

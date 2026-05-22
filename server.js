@@ -11,6 +11,12 @@ const portfolio = [
 ];
 
 const contacts = [];
+
+const chillYoutube = [
+  { id: 1, title: 'Lofi Girl - beats to relax/study to', channel: 'Lofi Girl', youtubeUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk' },
+  { id: 2, title: 'Chillhop Radio - jazzy & lofi hip hop beats', channel: 'Chillhop Music', youtubeUrl: 'https://www.youtube.com/watch?v=5yx6BWlEVcY' },
+  { id: 3, title: 'Calm Piano - sleep & focus', channel: 'Soothing Relaxation', youtubeUrl: 'https://www.youtube.com/watch?v=sA9qJfV6WmE' }
+];
 const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'spa' });
 
 function json(res, status, data) {
@@ -24,6 +30,8 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && url === '/api/portfolio') return json(res, 200, portfolio);
 
   if (req.method === 'GET' && url === '/api/contact') return json(res, 200, contacts);
+
+  if (req.method === 'GET' && url === '/api/chill-youtube') return json(res, 200, chillYoutube);
 
   if (req.method === 'POST' && url === '/api/contact') {
     let body = '';

@@ -23,6 +23,15 @@ const pageConfigs = {
     title: 'Bringing Vision to <em>Life</em>',
     lead: 'Nguyễn Văn Hoan · Professional Media Editor & Motion Designer',
     text: 'Từ cinematic edits đến motion graphics, mình kể câu chuyện bằng hình ảnh rõ ràng, nghệ thuật và giàu cảm xúc.',
+    cta: [
+      ['Xem Showreel', '#/showreel'],
+      ['Liên hệ dự án', '#/contact']
+    ],
+    stats: [
+      ['120+', 'Dự án đã hoàn thành'],
+      ['6+ năm', 'Kinh nghiệm thực chiến'],
+      ['24h', 'Phản hồi brief ban đầu']
+    ],
     cards: [
       ['Visual Storytelling', 'Xây dựng narrative có cảm xúc và rõ ràng.'],
       ['Art Direction', 'Định hướng hình ảnh đồng bộ thương hiệu.'],
@@ -91,12 +100,37 @@ const renderMenu = (activeRoute) =>
 
 const renderStandardPage = (routeKey) => {
   const page = pageConfigs[routeKey] || pageConfigs.home;
+  const isHome = routeKey === 'home';
+
   return `
-    <main class="single-page glass">
+    <main class="single-page glass ${isHome ? 'home-page' : ''}">
       <p class="eyebrow">${page.badge}</p>
       <h1>${page.title}</h1>
       <p class="lead">${page.lead}</p>
       <p class="sub">${page.text}</p>
+
+      ${
+        isHome
+          ? `
+        <div class="home-actions">
+          ${page.cta
+            .map(([label, hash], idx) => `<a href="${hash}" class="btn ${idx === 0 ? 'btn-primary' : 'btn-secondary'}">${label}</a>`)
+            .join('')}
+        </div>
+        <div class="home-stats">
+          ${page.stats
+            .map(
+              ([value, label]) => `
+            <article class="stat-card glass">
+              <strong>${value}</strong>
+              <span>${label}</span>
+            </article>`
+            )
+            .join('')}
+        </div>`
+          : ''
+      }
+
       <div class="page-cards">
         ${page.cards
           .map(

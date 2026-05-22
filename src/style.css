@@ -1,6 +1,6 @@
 :root{--bg:#f6f6f7;--card:#fff;--ink:#181b26;--muted:#666a73;--gold:#cca06a;}
 *{box-sizing:border-box}body{margin:0;font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-.page-shell{max-width:1280px;margin:20px auto;padding:18px;border:1px solid #e7e7e7;border-radius:20px;background:#fcfcfd}
+.page-shell{width:100%;margin:0;padding:18px;border:0;border-radius:0;background:#fcfcfd}
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 18px}.brand{font-size:36px;font-weight:800}.brand span{color:var(--gold)}
 nav{display:flex;gap:28px}nav a{text-decoration:none;color:#262a33;font-weight:500}nav a.active{border-bottom:2px solid var(--gold)}
 .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center}

@@ -3,6 +3,9 @@ import './style.css';
 const api = {
   async getPortfolio() {
     const res = await fetch('/api/portfolio');
+    if (!res.ok) {
+      throw new Error('Không thể tải portfolio.');
+    }
     return res.json();
   },
   async sendMessage(payload) {
@@ -11,6 +14,11 @@ const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+    if (!res.ok) {
+      throw new Error('Gửi tin nhắn thất bại.');
+    }
+
     return res.json();
   }
 };
@@ -31,8 +39,8 @@ document.querySelector('#app').innerHTML = `
         <p class="lead">Nguyễn Văn Hoan · Professional Media Editor & Motion Designer</p>
         <p class="desc">Tôi biến ý tưởng thành visual stories điện ảnh, motion graphics và social content truyền cảm hứng.</p>
         <div class="cta-row">
-          <button class="gold">View Showreel</button>
-          <button class="ghost">Contact Me</button>
+          <button id="showreelBtn" class="gold" type="button">View Showreel</button>
+          <button id="contactBtn" class="ghost" type="button">Contact Me</button>
         </div>
       </div>
       <div class="hero-photo">
@@ -60,7 +68,7 @@ document.querySelector('#app').innerHTML = `
         <input name="name" required placeholder="Tên của bạn" />
         <input name="email" required type="email" placeholder="Email" />
         <textarea name="message" required placeholder="Mô tả dự án..."></textarea>
-        <button class="gold" type="submit">Send Message</button>
+        <button id="sendMessageBtn" class="gold" type="submit">Send Message</button>
       </form>
       <p id="status" class="status"></p>
     </section>
@@ -71,26 +79,105 @@ const portfolioGrid = document.getElementById('portfolioGrid');
 const portfolioCount = document.getElementById('portfolioCount');
 const contactForm = document.getElementById('contactForm');
 const statusEl = document.getElementById('status');
+const showreelBtn = document.getElementById('showreelBtn');
+const contactBtn = document.getElementById('contactBtn');
+const sendMessageBtn = document.getElementById('sendMessageBtn');
+const navLinks = document.querySelectorAll('.topbar nav a');
+
+function smoothScrollTo(targetId) {
+  const section = document.querySelector(targetId);
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function setupNavigation() {
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const href = link.getAttribute('href') || '#';
+      if (!href.startsWith('#')) return;
+
+      event.preventDefault();
+
+      navLinks.forEach((item) => item.classList.remove('active'));
+      link.classList.add('active');
+
+      if (href === '#') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      smoothScrollTo(href);
+    });
+  });
+}
+
+function setupButtons() {
+  showreelBtn?.addEventListener('click', () => {
+    smoothScrollTo('#portfolio');
+    statusEl.textContent = 'Đang mở phần showreel/portfolio.';
+  });
+
+  contactBtn?.addEventListener('click', () => {
+    smoothScrollTo('#contact');
+    statusEl.textContent = 'Điền form để gửi yêu cầu của bạn nhé!';
+  });
+}
 
 async function loadPortfolio() {
-  const items = await api.getPortfolio();
-  portfolioCount.textContent = `${items.length} projects`;
-  portfolioGrid.innerHTML = items
-    .map(
-      (item) => `<article class="portfolio-item">
-          <img src="${item.thumbnail}" alt="${item.title}" />
-          <div class="overlay"><strong>${item.title}</strong><span>${item.category}</span></div>
-        </article>`
-    )
-    .join('');
+  try {
+    portfolioCount.textContent = 'Loading...';
+    const items = await api.getPortfolio();
+
+    portfolioCount.textContent = `${items.length} projects`;
+    portfolioGrid.innerHTML = items
+      .map(
+        (item) => `<article class="portfolio-item" tabindex="0" role="button" aria-label="${item.title}">
+            <img src="${item.thumbnail}" alt="${item.title}" />
+            <div class="overlay"><strong>${item.title}</strong><span>${item.category}</span></div>
+          </article>`
+      )
+      .join('');
+
+    portfolioGrid.querySelectorAll('.portfolio-item').forEach((card) => {
+      card.addEventListener('click', () => {
+        statusEl.textContent = `Bạn vừa chọn project: ${card.querySelector('strong')?.textContent || ''}`;
+      });
+
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          card.click();
+        }
+      });
+    });
+  } catch (error) {
+    portfolioCount.textContent = '0 projects';
+    portfolioGrid.innerHTML = '<p>Không tải được portfolio lúc này.</p>';
+    statusEl.textContent = error.message;
+  }
 }
 
 contactForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const payload = Object.fromEntries(new FormData(contactForm).entries());
-  const result = await api.sendMessage(payload);
-  statusEl.textContent = result.message || 'Đã gửi!';
-  contactForm.reset();
+
+  try {
+    sendMessageBtn.disabled = true;
+    sendMessageBtn.textContent = 'Sending...';
+    statusEl.textContent = 'Đang gửi tin nhắn...';
+
+    const result = await api.sendMessage(payload);
+    statusEl.textContent = result.message || 'Đã gửi!';
+    contactForm.reset();
+  } catch (error) {
+    statusEl.textContent = error.message;
+  } finally {
+    sendMessageBtn.disabled = false;
+    sendMessageBtn.textContent = 'Send Message';
+  }
 });
 
+setupNavigation();
+setupButtons();
 loadPortfolio();

@@ -88,6 +88,15 @@ h1 em { font-family: 'Playfair Display', serif; color:#d6a56a; font-style: itali
 .playlist li { display:flex; justify-content:space-between; align-items:center; }
 .playlist li.is-active { border-color:#d4a164; background: rgba(212,161,100,.14); }
 
+.youtube-block { margin-top: 12px; }
+.youtube-block h3 { margin: 0 0 8px; }
+.youtube-list { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.youtube-list li { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid #eadbc8; border-radius:12px; padding:10px; background: rgba(255,255,255,.65); }
+.youtube-list span { display:block; color:#6a5f53; font-size:12px; margin-top:2px; }
+.youtube-list a { text-decoration:none; padding:7px 10px; border-radius:999px; border:1px solid #d9c4ad; color:#5d4530; background:#fff; font-weight:600; white-space: nowrap; }
+.youtube-state { margin: 0; color:#6a5f53; font-size: 13px; }
+.youtube-state.error { color: #b33a3a; }
+
 @media (max-width: 1100px) {
   .hero-art,.services-grid,.strip-grid,.page-cards,.home-stats,.chill-layout { grid-template-columns: 1fr; }
   h1 { font-size: 56px; }

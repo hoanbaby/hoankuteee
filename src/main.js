@@ -1,15 +1,15 @@
 import './style.css';
 
-const chillState = {
+const musicState = {
   loading: false,
   error: '',
   items: [],
   keyword: '',
   currentIndex: 0,
-  isPlaying: false
+  youtubeInput: '',
+  youtubeEmbedUrl: '',
+  youtubeSearchUrl: ''
 };
-
-const chillYoutubeState = { loading: false, items: [], error: '' };
 
 const routes = [
   { key: 'home', label: 'Home', hash: '#/' },
@@ -28,81 +28,75 @@ const renderHomePage = () => { const page = pageConfigs.home; return `<main clas
 
 const renderStandardPage = (routeKey) => { if (routeKey === 'home') return renderHomePage(); const page = pageConfigs[routeKey]; return `<main class="single-page glass"><p class="eyebrow">${page.badge}</p><h1>${page.title}</h1><p class="lead">${page.lead}</p><p class="sub">${page.text}</p><div class="page-cards">${page.cards.map(([title, desc]) => `<article class="panel glass"><h3>${title}</h3><p>${desc}</p></article>`).join('')}</div></main>`; };
 
-const renderYoutubeList = () => {
-  if (chillYoutubeState.loading) return '<p class="youtube-state">Đang tải playlist YouTube...</p>';
-  if (chillYoutubeState.error) return `<p class="youtube-state error">${chillYoutubeState.error}</p>`;
-  if (!chillYoutubeState.items.length) return '<p class="youtube-state">Chưa có playlist nào.</p>';
-  return `<ul class="youtube-list">${chillYoutubeState.items.map((item) => `<li><div><strong>${item.title}</strong><span>${item.channel}</span></div><a href="${item.youtubeUrl}" target="_blank" rel="noreferrer">Mở YouTube</a></li>`).join('')}</ul>`;
-};
-
-const getCurrentTrack = () => chillState.items[chillState.currentIndex] || null;
+const getCurrentTrack = () => musicState.items[musicState.currentIndex] || null;
 
 const renderTrackList = () => {
-  if (chillState.loading) return '<p class="youtube-state">Đang tải nhạc...</p>';
-  if (chillState.error) return `<p class="youtube-state error">${chillState.error}</p>`;
-  if (!chillState.items.length) return '<p class="youtube-state">Không có bài phù hợp.</p>';
-  return `<ul class="playlist">${chillState.items.map((track, idx) => `<li data-track-index="${idx}" class="${idx === chillState.currentIndex ? 'is-active' : ''}"><div><strong>${track.title}</strong><span>${track.artist} · ${track.mood}</span></div><time>${track.length}</time></li>`).join('')}</ul>`;
+  if (musicState.loading) return '<p class="youtube-state">Đang tìm bài hát từ Deezer...</p>';
+  if (musicState.error) return `<p class="youtube-state error">${musicState.error}</p>`;
+  if (!musicState.items.length) return '<p class="youtube-state">Nhập từ khóa để tìm bài hát.</p>';
+  return `<ul class="playlist">${musicState.items.map((track, idx) => `<li data-track-index="${idx}" class="${idx === musicState.currentIndex ? 'is-active' : ''}"><div class="track-info"><strong>${track.title}</strong><span>${track.artist} · ${track.album}</span></div><time>Preview 30s</time></li>`).join('')}</ul>`;
 };
 
-const loadChillTracks = async (keyword = '') => {
-  chillState.loading = true; chillState.error = ''; chillState.keyword = keyword; renderApp();
+const searchSongs = async (keyword) => {
+  musicState.loading = true;
+  musicState.error = '';
+  musicState.keyword = keyword;
+  renderApp();
   try {
-    const res = await fetch(`/api/chill-tracks${keyword ? `?q=${encodeURIComponent(keyword)}` : ''}`);
-    if (!res.ok) throw new Error('Không tải được playlist.');
-    chillState.items = await res.json();
-    chillState.currentIndex = 0;
-  } catch (error) { chillState.error = error.message; }
-  finally { chillState.loading = false; renderApp(); syncAudio(); }
+    const res = await fetch(`/api/deezer-search?q=${encodeURIComponent(keyword)}`);
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.message || 'Không tìm được bài hát.');
+    musicState.items = payload;
+    musicState.currentIndex = 0;
+    const first = payload[0];
+    if (first) musicState.youtubeSearchUrl = first.youtubeSearchUrl;
+  } catch (error) {
+    musicState.error = error.message;
+  } finally {
+    musicState.loading = false;
+    renderApp();
+  }
 };
 
-const loadChillYoutube = async () => {
-  chillYoutubeState.loading = true; chillYoutubeState.error = ''; renderApp();
-  try { const res = await fetch('/api/chill-youtube'); if (!res.ok) throw new Error('Không thể tải API YouTube.'); chillYoutubeState.items = await res.json(); }
-  catch (error) { chillYoutubeState.error = error.message; }
-  finally { chillYoutubeState.loading = false; renderApp(); }
+const renderYoutubeSection = () => {
+  const current = getCurrentTrack();
+  return `<div class="youtube-block"><h3>Nghe full / MV trên YouTube</h3>
+    <div class="search-row">
+      <input id="youtube-input" type="text" placeholder="Dán link YouTube để phát iframe" value="${musicState.youtubeInput}">
+      <button id="youtube-embed-btn" type="button">Phát</button>
+    </div>
+    ${current?.youtubeSearchUrl ? `<a class="yt-search-link" target="_blank" rel="noreferrer" href="${current.youtubeSearchUrl}">Tìm MV của bài này trên YouTube</a>` : ''}
+    ${musicState.youtubeEmbedUrl ? `<iframe class="youtube-frame" src="${musicState.youtubeEmbedUrl}" title="YouTube player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>` : '<p class="youtube-state">Chưa có video được gắn. Hãy dán link YouTube để phát bằng iframe.</p>'}
+  </div>`;
 };
 
 const renderChillPanel = () => {
   const current = getCurrentTrack();
-  return `<section class="chill-panel"><div class="chill-layout"><div><div class="chill-head"><div><p class="badge">Music page</p><h2>Chill một chút</h2><p class="chill-sub">Nghe nhạc trực tiếp + tìm kiếm từ backend.</p></div><a class="btn-home" href="#/">← Về trang chủ</a></div><div class="search-row"><input id="track-search" type="text" placeholder="Tìm tên bài, nghệ sĩ..." value="${chillState.keyword}"><button id="search-btn" type="button">Tìm</button></div><div class="now-playing"><div class="cover-art"></div><div class="track-meta"><strong>${current?.title || 'Chưa chọn bài'}</strong><span>${current ? `${current.artist} · ${current.mood}` : 'Hãy tìm và chọn một bài từ playlist.'}</span><audio id="chill-audio" controls ${current?.audioUrl ? `src="${current.audioUrl}"` : ''}></audio></div></div><div class="player-actions"><button type="button" id="prev-track">⏮</button><button type="button" class="play" id="play-toggle">${chillState.isPlaying ? '⏸' : '▶'}</button><button type="button" id="next-track">⏭</button></div><div class="chill-stats"><article><strong>${chillState.items.length || 0}</strong><span>Tracks loaded</span></article><article><strong>API</strong><span>Backend connected</span></article><article><strong>Lo-fi / Ambient</strong><span>Main genres</span></article></div></div><aside class="playlist-wrap"><div class="playlist-head"><h3>Playlist</h3><small>Searchable</small></div>${renderTrackList()}<div class="youtube-block"><h3>YouTube 1-click</h3>${renderYoutubeList()}</div></aside></div></section>`;
+  return `<section class="chill-panel"><div class="chill-layout"><div><div class="chill-head"><div><p class="badge">Music page</p><h2>Tìm bài hát & nghe thử 30 giây</h2><p class="chill-sub">Web gọi Deezer API lấy tên bài, ca sĩ, ảnh album và preview 30s.</p></div><a class="btn-home" href="#/">← Về trang chủ</a></div><div class="search-row"><input id="track-search" type="text" placeholder="Ví dụ: Sơn Tùng M-TP" value="${musicState.keyword}"><button id="search-btn" type="button">Tìm</button></div><div class="now-playing"><div class="cover-art" style="background-image:url('${current?.albumCover || ''}'); background-size:cover; background-position:center;"></div><div class="track-meta"><strong>${current?.title || 'Chưa chọn bài'}</strong><span>${current ? `${current.artist} · ${current.album}` : 'Tìm bài để xem kết quả từ Deezer.'}</span><audio id="chill-audio" controls ${current?.preview ? `src="${current.preview}"` : ''}></audio></div></div>${renderYoutubeSection()}</div><aside class="playlist-wrap"><div class="playlist-head"><h3>Kết quả từ Deezer</h3><small>Preview 30 giây</small></div>${renderTrackList()}</aside></div></section>`;
 };
 
 const bindChillEvents = () => {
   const searchBtn = document.querySelector('#search-btn');
   const input = document.querySelector('#track-search');
-  searchBtn?.addEventListener('click', () => loadChillTracks(input?.value || ''));
-  input?.addEventListener('keydown', (event) => { if (event.key === 'Enter') loadChillTracks(input.value || ''); });
+  searchBtn?.addEventListener('click', () => searchSongs(input?.value?.trim() || ''));
+  input?.addEventListener('keydown', (event) => { if (event.key === 'Enter') searchSongs(input.value.trim()); });
 
   document.querySelectorAll('[data-track-index]').forEach((item) => item.addEventListener('click', () => {
-    chillState.currentIndex = Number(item.getAttribute('data-track-index'));
-    chillState.isPlaying = true;
+    musicState.currentIndex = Number(item.getAttribute('data-track-index'));
+    const track = getCurrentTrack();
+    musicState.youtubeSearchUrl = track?.youtubeSearchUrl || '';
     renderApp();
-    syncAudio(true);
   }));
 
-  document.querySelector('#prev-track')?.addEventListener('click', () => changeTrack(-1));
-  document.querySelector('#next-track')?.addEventListener('click', () => changeTrack(1));
-  document.querySelector('#play-toggle')?.addEventListener('click', () => togglePlay());
-};
-
-const syncAudio = (forcePlay = false) => {
-  const audio = document.querySelector('#chill-audio');
-  if (!audio) return;
-  audio.onended = () => changeTrack(1);
-  if (forcePlay || chillState.isPlaying) audio.play().catch(() => { chillState.isPlaying = false; renderApp(); });
-};
-const changeTrack = (step) => {
-  if (!chillState.items.length) return;
-  chillState.currentIndex = (chillState.currentIndex + step + chillState.items.length) % chillState.items.length;
-  chillState.isPlaying = true;
-  renderApp();
-  syncAudio(true);
-};
-const togglePlay = () => {
-  const audio = document.querySelector('#chill-audio');
-  if (!audio) return;
-  if (audio.paused) { audio.play(); chillState.isPlaying = true; } else { audio.pause(); chillState.isPlaying = false; }
-  renderApp();
+  document.querySelector('#youtube-embed-btn')?.addEventListener('click', async () => {
+    const url = document.querySelector('#youtube-input')?.value?.trim() || '';
+    musicState.youtubeInput = url;
+    const res = await fetch(`/api/youtube-embed?url=${encodeURIComponent(url)}&q=${encodeURIComponent(getCurrentTrack()?.youtubeSearchQuery || '')}`);
+    const payload = await res.json();
+    musicState.youtubeEmbedUrl = payload.embedUrl || '';
+    musicState.youtubeSearchUrl = payload.searchUrl || musicState.youtubeSearchUrl;
+    renderApp();
+  });
 };
 
 const renderApp = () => {
@@ -111,12 +105,5 @@ const renderApp = () => {
   if (routeKey === 'chill') bindChillEvents();
 };
 
-window.addEventListener('hashchange', () => {
-  renderApp();
-  if (getRouteKey() === 'chill') {
-    if (!chillState.items.length && !chillState.loading) loadChillTracks();
-    if (!chillYoutubeState.items.length && !chillYoutubeState.loading) loadChillYoutube();
-  }
-});
+window.addEventListener('hashchange', () => renderApp());
 renderApp();
-if (getRouteKey() === 'chill') { loadChillTracks(); loadChillYoutube(); }
